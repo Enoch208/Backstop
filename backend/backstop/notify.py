@@ -1,20 +1,19 @@
 from backstop import mcp
 from backstop.config import settings
 
-SLACK_HINTS = ("slack",)
-SLACK_ACTIONS = ("post", "send", "message")
-LINEAR_HINTS = ("linear",)
-LINEAR_ACTIONS = ("create", "issue")
+SLACK_NAMES = ["slack_post_message", "post_message", "chat_postMessage", "send_message"]
+SLACK_CONTAINS = ["post", "message"]
+LINEAR_NAMES = ["save_issue", "create_issue"]
+LINEAR_CONTAINS = ["issue", "create"]
 
 
-def _pick(tools: list[str], hints: tuple, actions: tuple) -> str | None:
-    for name in tools:
-        low = name.lower()
-        if any(h in low for h in hints) and any(a in low for a in actions):
+def _pick(tools: list[str], exact: list[str], contains_all: list[str]) -> str | None:
+    for name in exact:
+        if name in tools:
             return name
     for name in tools:
         low = name.lower()
-        if any(a in low for a in actions):
+        if all(part in low for part in contains_all):
             return name
     return None
 
@@ -34,8 +33,8 @@ async def notify_incident(headline: str, detail: str) -> list[tuple[str, str, bo
         return [("MCP gateway unreachable", str(exc)[:100], False)]
 
     results = []
-    slack = _pick(tools, SLACK_HINTS, SLACK_ACTIONS)
-    linear = _pick(tools, LINEAR_HINTS, LINEAR_ACTIONS)
+    slack = _pick(tools, SLACK_NAMES, SLACK_CONTAINS)
+    linear = _pick(tools, LINEAR_NAMES, LINEAR_CONTAINS)
 
     if slack:
         results.append(

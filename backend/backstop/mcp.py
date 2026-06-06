@@ -5,9 +5,7 @@ from backstop.config import settings
 
 
 def _client() -> Client:
-    transport = StreamableHttpTransport(
-        settings.mcp_url, auth=f"Bearer {settings.api_key}"
-    )
+    transport = StreamableHttpTransport(settings.mcp_url, auth=settings.api_key)
     return Client(transport=transport)
 
 
