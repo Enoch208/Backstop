@@ -19,7 +19,9 @@ nohup uv run python -m backstop.infra_mcp > /tmp/bs-mcp.log 2>&1 &
 
 echo "==> building + starting frontend (:3000) with API at https://api.$DOMAIN"
 cd "$ROOT/frontend"
-NEXT_PUBLIC_API_URL="https://api.$DOMAIN" npm run build
+NEXT_PUBLIC_API_URL="https://api.$DOMAIN" \
+NEXT_PUBLIC_TFY_OBSERVABILITY_URL="${TFY_OBSERVABILITY_URL:-https://backstop.truefoundry.cloud}" \
+  npm run build
 nohup npx next start -p 3000 > /tmp/bs-fe.log 2>&1 &
 
 echo "==> services up. Start Caddy:  DOMAIN=$DOMAIN caddy run --config $ROOT/deploy/Caddyfile"
