@@ -7,7 +7,7 @@ from sse_starlette.sse import EventSourceResponse
 
 from backstop import controller
 from backstop.config import settings
-from backstop.demo import scripted_diagnoser
+from backstop.demo import demo_diagnoser
 from backstop.events import bus
 from backstop.report import build_report
 from backstop.runner import execute_demo
@@ -33,7 +33,7 @@ async def demo() -> dict:
             hardened_backend,
             naive_id,
             hardened_id,
-            scripted_diagnoser(),
+            demo_diagnoser(),
             bus,
             settings.settle_seconds,
         )

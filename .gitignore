@@ -7,3 +7,6 @@ docs/superpowers/
 .DS_Store
 ui.json
 backstop-prd.md
+t.js
+mod.js
+*.local.js

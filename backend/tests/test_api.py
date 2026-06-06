@@ -6,6 +6,7 @@ from backstop.infra.mock import MockBackend
 
 def test_demo_endpoint_returns_run_ids(monkeypatch):
     monkeypatch.setattr(api.settings, "settle_seconds", 0)
+    monkeypatch.setattr(api.settings, "live", False)
     monkeypatch.setattr(
         controller, "make_backends", lambda: (MockBackend(), MockBackend())
     )

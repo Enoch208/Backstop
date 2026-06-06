@@ -1,3 +1,5 @@
+from backstop import llm
+from backstop.config import settings
 from backstop.contracts import Diagnosis, Signals
 
 NAIVE_NAMESPACE = "backstop-naive"
@@ -33,3 +35,16 @@ def scripted_diagnoser():
         return _hallucinated(signals)
 
     return diagnoser
+
+
+def live_diagnoser():
+    def diagnoser(signals: Signals, model: str | None = None) -> Diagnosis:
+        if model == "stronger":
+            return llm.diagnose(signals)
+        return _hallucinated(signals)
+
+    return diagnoser
+
+
+def demo_diagnoser():
+    return live_diagnoser() if settings.live else scripted_diagnoser()

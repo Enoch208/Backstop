@@ -14,6 +14,7 @@ class Settings:
     backend = os.getenv("BACKSTOP_BACKEND", "kind")
     namespace = os.getenv("K8S_NAMESPACE", "backstop-demo")
     settle_seconds = int(os.getenv("BACKSTOP_SETTLE_SECONDS", "10"))
+    live = os.getenv("BACKSTOP_LIVE", "false").lower() == "true"
 
 
 settings = Settings()

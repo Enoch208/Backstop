@@ -17,6 +17,14 @@ def _client() -> OpenAI:
     return OpenAI(base_url=settings.base_url, api_key=settings.api_key)
 
 
+def _extract_json(text: str) -> str:
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1:
+        return text
+    return text[start : end + 1]
+
+
 def diagnose(signals: Signals, model: str | None = None) -> Diagnosis:
     response = _client().chat.completions.create(
         model=model or settings.model,
@@ -25,5 +33,7 @@ def diagnose(signals: Signals, model: str | None = None) -> Diagnosis:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": signals.model_dump_json()},
         ],
+        extra_headers={"X-TFY-LOGGING-CONFIG": '{"enabled": true}'},
     )
-    return Diagnosis.model_validate_json(response.choices[0].message.content)
+    content = response.choices[0].message.content or ""
+    return Diagnosis.model_validate_json(_extract_json(content))
