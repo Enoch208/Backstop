@@ -8,7 +8,6 @@ import ClusterWidget from "./ClusterWidget";
 import FallbackStrip from "./FallbackStrip";
 import ReceiptsPanel from "./ReceiptsPanel";
 import ReportCard from "./ReportCard";
-import Sidebar from "./Sidebar";
 import StatCard from "./StatCard";
 import { IncidentReport } from "./types";
 import { useClusterState, useRunStream } from "./useRunStream";
@@ -97,11 +96,8 @@ export default function RunPage() {
   const integrity = deployments.length ? `${healthy}/${deployments.length}` : "—";
 
   return (
-    <div className="flex min-h-screen bg-[#08080a] text-white">
-      <Sidebar />
-
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header id="top" className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.06] px-8 py-6">
+    <>
+      <header id="top" className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.06] px-8 py-6">
           <div>
             <h1 className="text-2xl font-light tracking-tight">Incident Console</h1>
             <p className="mt-1 text-sm font-extralight text-zinc-500">
@@ -203,7 +199,6 @@ export default function RunPage() {
 
           {report && <ReportCard report={report} />}
         </div>
-      </div>
-    </div>
+    </>
   );
 }

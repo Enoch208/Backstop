@@ -21,12 +21,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+_recent_runs: list[dict] = []
+
 
 @app.post("/demo")
 async def demo() -> dict:
     demo_id = uuid.uuid4().hex[:8]
     naive_id = f"naive-{demo_id}"
     hardened_id = f"hardened-{demo_id}"
+    _recent_runs.insert(
+        0, {"demo_id": demo_id, "naive": naive_id, "hardened": hardened_id}
+    )
+    del _recent_runs[20:]
     naive_backend, hardened_backend = controller.make_backends()
     asyncio.create_task(
         execute_demo(
@@ -40,6 +46,25 @@ async def demo() -> dict:
         )
     )
     return {"demo_id": demo_id, "naive": naive_id, "hardened": hardened_id}
+
+
+@app.get("/runs")
+async def runs() -> dict:
+    out = []
+    for run in _recent_runs:
+        hardened = build_report(bus.history(run["hardened"]))
+        naive_events = bus.history(run["naive"])
+        naive_done = next(
+            (e for e in reversed(naive_events) if e.kind.value == "done"), None
+        )
+        out.append(
+            {
+                "demo_id": run["demo_id"],
+                "hardened": hardened.model_dump(),
+                "naive_outcome": naive_done.label if naive_done else "running",
+            }
+        )
+    return {"runs": out}
 
 
 @app.get("/events/{run_id}")
