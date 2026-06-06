@@ -52,6 +52,17 @@ body {
   background: #3f3f46;
 }
 
+button:not(:disabled),
+[role="button"]:not(:disabled),
+summary,
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 /* Hero gradient step bars (ported from reference) */
 .step-bar {
   background: linear-gradient(

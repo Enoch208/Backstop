@@ -19,7 +19,7 @@ function Row({ name, state }: { name: string; state: DeploymentState }) {
 
 export default function ClusterWidget({ state }: { state: ClusterState | null }) {
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-[#131315] p-6">
+    <div className="flex flex-1 flex-col rounded-2xl border border-white/[0.06] bg-[#131315] p-6">
       <h3 className="text-sm font-semibold text-white">Live cluster</h3>
       <p className="mt-1 mb-4 text-[11px] font-extralight text-zinc-500">
         Real Kubernetes, polled every 2s.

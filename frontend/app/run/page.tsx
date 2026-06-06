@@ -51,6 +51,13 @@ export default function RunPage() {
     : runIds
       ? "Running"
       : "Idle";
+  const naiveOutcome = naiveDone
+    ? naiveDone.severity === "red"
+      ? "Catastrophe"
+      : "Acted"
+    : runIds
+      ? "Running"
+      : "Idle";
 
   const deployments = cluster ? Object.values(cluster).flatMap((ns) => [ns.checkout, ns.prod_db]) : [];
   const healthy = deployments.filter((d) => d.desired > 0 && d.ready === d.desired).length;
@@ -90,36 +97,43 @@ export default function RunPage() {
           </div>
         </header>
 
-        <div className="grid flex-1 grid-cols-1 gap-6 p-8 xl:grid-cols-[1fr_20rem]">
-          <div className="flex flex-col gap-6">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-              <StatCard
-                icon="solar:shield-check-linear"
-                label="Catastrophes averted"
-                value={String(averted)}
-                hint="destructive actions blocked by guardrails"
-                tone="accent"
-              />
-              <StatCard
-                icon="solar:cpu-bolt-linear"
-                label="Backstop"
-                value={backstopOutcome}
-                hint="the fail-safe agent's outcome"
-                tone={hardenedDone?.severity === "green" ? "success" : "neutral"}
-              />
-              <StatCard
-                icon="solar:server-square-linear"
-                label="Cluster integrity"
-                value={integrity}
-                hint="deployments ready across both namespaces"
-                tone={
-                  deployments.length && healthy < deployments.length
-                    ? "danger"
-                    : "neutral"
-                }
-              />
-            </div>
+        <div className="flex flex-1 flex-col gap-6 p-8">
+          <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
+            <StatCard
+              icon="solar:shield-check-linear"
+              label="Catastrophes averted"
+              value={String(averted)}
+              hint="destructive actions blocked by guardrails"
+              tone="accent"
+            />
+            <StatCard
+              icon="solar:cpu-bolt-linear"
+              label="Backstop"
+              value={backstopOutcome}
+              hint="the fail-safe agent's outcome"
+              tone={hardenedDone?.severity === "green" ? "success" : "neutral"}
+            />
+            <StatCard
+              icon="solar:danger-triangle-linear"
+              label="Naive agent"
+              value={naiveOutcome}
+              hint="what the unguarded agent did"
+              tone={naiveDone?.severity === "red" ? "danger" : "neutral"}
+            />
+            <StatCard
+              icon="solar:server-square-linear"
+              label="Cluster integrity"
+              value={integrity}
+              hint="deployments ready, both namespaces"
+              tone={
+                deployments.length && healthy < deployments.length
+                  ? "danger"
+                  : "neutral"
+              }
+            />
+          </div>
 
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_20rem]">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <AgentColumn
                 title="Naive agent"
@@ -136,11 +150,11 @@ export default function RunPage() {
                 running={Boolean(runIds) && !hardenedDone}
               />
             </div>
-          </div>
 
-          <div className="flex flex-col gap-6">
-            <ReceiptsPanel events={[...naiveEvents, ...hardenedEvents]} />
-            <ClusterWidget state={cluster} />
+            <div className="flex flex-col gap-6">
+              <ReceiptsPanel events={[...naiveEvents, ...hardenedEvents]} />
+              <ClusterWidget state={cluster} />
+            </div>
           </div>
         </div>
       </div>
