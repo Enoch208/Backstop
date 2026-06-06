@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Surfaces */
+  --color-background: #030303;
+  --color-surface: #131315;
+  --color-surface-2: #18181b;
+  --color-ink: #ffffff;
+
+  /* Borders */
+  --color-line: #27272a;
+  --color-line-2: #3f3f46;
+
+  /* Accent */
+  --color-accent: #2563eb;
+  --color-accent-2: #60a5fa;
+
+  /* Fonts (wired from next/font in layout.tsx) */
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar (ported from reference) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #131315;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Hero gradient step bars (ported from reference) */
+.step-bar {
+  background: linear-gradient(
+    to top,
+    #172554 0%,
+    #2563eb 22%,
+    #ffffff 42%,
+    #60a5fa 65%,
+    transparent 95%
+  );
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+  border-left: 1px solid rgba(0, 0, 0, 0.15);
+  transform-origin: bottom;
+  will-change: height, opacity;
+}
+
+@keyframes slowPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+}
+
+.animate-slow-pulse {
+  animation: slowPulse 3s ease-in-out infinite;
+}
