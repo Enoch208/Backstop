@@ -119,12 +119,12 @@ export default function DemoCallout() {
               <Icon icon="solar:code-square-linear" className="text-3xl" />
             </div>
             <h3 className="mb-6 text-3xl font-light tracking-tighter text-white md:text-4xl">
-              Read the code. Break the sandbox.
+              Read the code. Break the cluster.
             </h3>
             <p className="mb-12 max-w-xl text-lg leading-relaxed font-extralight text-zinc-400">
-              The failure and the recovery are real — GitHub, Slack and Linear
-              over the MCP gateway, infra actions on a live disposable sandbox.
-              No theater.
+              The failure and the recovery are real — a live Kubernetes cluster
+              you actually break and watch recover, diagnosed by Claude through
+              the TrueFoundry gateway, caught by custom guardrails. No theater.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row">
               <Link
