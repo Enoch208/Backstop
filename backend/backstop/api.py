@@ -9,6 +9,7 @@ from backstop import controller
 from backstop.config import settings
 from backstop.demo import scripted_diagnoser
 from backstop.events import bus
+from backstop.report import build_report
 from backstop.runner import execute_demo
 
 app = FastAPI(title="Backstop")
@@ -47,6 +48,11 @@ async def events(run_id: str) -> EventSourceResponse:
             yield {"event": "run", "data": event.model_dump_json()}
 
     return EventSourceResponse(stream())
+
+
+@app.get("/report/{run_id}")
+async def report(run_id: str):
+    return build_report(bus.history(run_id))
 
 
 @app.post("/reset")
