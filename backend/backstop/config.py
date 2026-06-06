@@ -15,6 +15,9 @@ class Settings:
     namespace = os.getenv("K8S_NAMESPACE", "backstop-demo")
     settle_seconds = int(os.getenv("BACKSTOP_SETTLE_SECONDS", "10"))
     live = os.getenv("BACKSTOP_LIVE", "false").lower() == "true"
+    mcp_url = os.getenv("BACKSTOP_MCP_URL", "")
+    slack_channel = os.getenv("BACKSTOP_SLACK_CHANNEL", "#incidents")
+    linear_team = os.getenv("BACKSTOP_LINEAR_TEAM", "")
 
 
 settings = Settings()

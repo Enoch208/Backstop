@@ -15,8 +15,10 @@ from backstop.events import bus as default_bus
 from backstop.guardrails.action import check_action
 from backstop.guardrails.pii import redact_signals
 from backstop.guardrails.quality import check_quality
+from backstop.config import settings
 from backstop.infra.base import InfraBackend
 from backstop.llm import diagnose as llm_diagnose
+from backstop.notify import notify_incident
 
 Diagnoser = Callable[[Signals, str | None], Diagnosis]
 
@@ -85,7 +87,7 @@ async def run_hardened(
         EventKind.step,
         "Gathered signals",
         f"error_rate={signals.metrics.get('checkout.error_rate')}",
-        data={"metrics": signals.metrics, "feature": "Scoped MCP (read-only)"},
+        data={"metrics": signals.metrics, "feature": "Read-only access"},
     )
 
     signals, redactions = redact_signals(signals)
@@ -197,10 +199,23 @@ async def run_hardened(
         "Executed remediation",
         result,
         severity="green",
-        data={"feature": "Scoped MCP (narrow-write)"},
+        data={"feature": "Scoped write"},
     )
 
     healed = await asyncio.to_thread(backend.gather)
+
+    if settings.mcp_url:
+        for label, detail, ok in await notify_incident(
+            f"Resolved: {diagnosis.hypothesis[:80]}", result
+        ):
+            await out.emit(
+                EventKind.action if ok else EventKind.step,
+                label,
+                detail,
+                severity="green" if ok else "amber",
+                data={"feature": "MCP Gateway"},
+            )
+
     await out.emit(
         EventKind.done,
         "Incident resolved",
