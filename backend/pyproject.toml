@@ -1,0 +1,29 @@
+[project]
+name = "backstop"
+version = "0.1.0"
+description = "Fail-safe on-call SRE incident agent"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.136.3",
+    "httpx>=0.28.1",
+    "kubernetes>=36.0.2",
+    "openai>=2.41.0",
+    "pydantic>=2.13.4",
+    "python-dotenv>=1.2.2",
+    "sse-starlette>=3.4.4",
+    "uvicorn[standard]>=0.49.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
+    "respx>=0.23.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"
+addopts = "-q"
+testpaths = ["tests"]
