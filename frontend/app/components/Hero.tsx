@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Icon } from "@iconify/react";
 import HeroBackground from "./HeroBackground";
 import MaskedText from "./MaskedText";
@@ -53,13 +54,13 @@ export default function Hero() {
             <Icon icon="simple-icons:github" className="text-base" />
             View on GitHub
           </a>
-          <a
-            href="#demo"
+          <Link
+            href="/run"
             className="flex w-full items-center justify-center gap-2 border border-line bg-surface px-8 py-4 text-sm font-medium text-zinc-300 transition-all hover:border-line-2 hover:text-white active:scale-95 sm:w-auto"
           >
             <Icon icon="solar:play-circle-linear" className="text-base" />
-            See the demo
-          </a>
+            See it live
+          </Link>
         </Reveal>
       </main>
     </section>

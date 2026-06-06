@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Icon } from "@iconify/react";
 import MaskedText from "./MaskedText";
 import Reveal from "./Reveal";
@@ -125,12 +126,19 @@ export default function DemoCallout() {
               over the MCP gateway, infra actions on a live disposable sandbox.
               No theater.
             </p>
-            <div>
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <Link
+                href="/run"
+                className="inline-flex items-center justify-center gap-2 bg-white px-10 py-4 text-sm font-medium text-black transition-all hover:bg-zinc-200 active:scale-95"
+              >
+                <Icon icon="solar:play-circle-linear" className="text-base" />
+                Open the live console
+              </Link>
               <a
                 href={GITHUB_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 bg-white px-10 py-4 text-sm font-medium text-black transition-all hover:bg-zinc-200 active:scale-95"
+                className="inline-flex items-center justify-center gap-2 border border-line bg-surface px-10 py-4 text-sm font-medium text-zinc-300 transition-all hover:border-line-2 hover:text-white active:scale-95"
               >
                 <Icon icon="simple-icons:github" className="text-base" />
                 View on GitHub
