@@ -18,6 +18,8 @@ class Settings:
     mcp_url = os.getenv("BACKSTOP_MCP_URL", "")
     slack_channel = os.getenv("BACKSTOP_SLACK_CHANNEL", "#incidents")
     linear_team = os.getenv("BACKSTOP_LINEAR_TEAM", "")
+    prompt_fqn = os.getenv("BACKSTOP_PROMPT_FQN", "")
+    tfy_host = os.getenv("TFY_HOST", "https://backstop.truefoundry.cloud")
 
 
 settings = Settings()

@@ -12,6 +12,7 @@ dependencies = [
     "pydantic>=2.13.4",
     "python-dotenv>=1.2.2",
     "sse-starlette>=3.4.4",
+    "truefoundry>=0.15.3",
     "uvicorn[standard]>=0.49.0",
 ]
 

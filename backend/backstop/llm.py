@@ -25,14 +25,24 @@ def _extract_json(text: str) -> str:
     return text[start : end + 1]
 
 
+def _messages(signals: Signals) -> list[dict]:
+    from backstop import prompts
+
+    payload = signals.model_dump_json()
+    managed = prompts.fetch_messages(payload)
+    if managed:
+        return managed
+    return [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": payload},
+    ]
+
+
 def diagnose(signals: Signals, model: str | None = None) -> Diagnosis:
     response = _client().chat.completions.create(
         model=model or settings.model,
         response_format={"type": "json_object"},
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": signals.model_dump_json()},
-        ],
+        messages=_messages(signals),
         extra_headers={"X-TFY-LOGGING-CONFIG": '{"enabled": true}'},
     )
     content = response.choices[0].message.content or ""
