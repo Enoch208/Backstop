@@ -7,7 +7,7 @@ const STEPS = [
     icon: "solar:magnifer-zoom-in-linear",
     title: "Triage",
     description:
-      "Signals are gathered through a read-only virtual MCP server — metrics, logs, recent deploys, commits. Secrets are redacted before the model ever sees them.",
+      "Signals are gathered through read-only, scoped access — metrics, logs, recent deploys. Secrets are redacted before the model ever sees them.",
   },
   {
     icon: "solar:cpu-bolt-linear",
@@ -25,7 +25,7 @@ const STEPS = [
     icon: "solar:rocket-2-linear",
     title: "Execute or escalate",
     description:
-      "Only validated, scoped actions run — through a separate narrow-write MCP with audit logging. If the anomaly budget trips, it checkpoints and hands off to a human.",
+      "Only validated, scoped actions run — through a separate narrow-write path. Then the on-call is paged and a ticket opened over the MCP gateway. If the anomaly budget trips, it hands off to a human.",
   },
 ];
 

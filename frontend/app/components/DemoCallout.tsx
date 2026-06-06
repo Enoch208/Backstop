@@ -158,7 +158,7 @@ export default function DemoCallout() {
               </h4>
               <p className="text-sm leading-relaxed font-extralight text-white/80">
                 Every red and amber event maps to a TrueFoundry capability:
-                gateway, scoped MCP, custom guardrails, observability.
+                gateway, MCP, custom guardrails, observability.
               </p>
             </div>
             <div className="absolute -right-24 -bottom-24 h-72 w-72 rounded-full border border-white/20 transition-transform duration-1000 ease-out group-hover:scale-110" />

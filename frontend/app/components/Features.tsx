@@ -7,8 +7,8 @@ const FEATURES = [
     icon: "solar:hand-stars-linear",
     title: "The hands are removed",
     description:
-      "Destructive tools are disabled at the MCP gateway — they never enter the agent's toolset. It physically cannot nuke prod, even on a hallucination.",
-    badge: "Scoped MCP",
+      "Destructive tools are never in the agent's toolset, and the action gate blocks any that slip through. It physically cannot nuke prod, even on a hallucination.",
+    badge: "Scoped tools",
   },
   {
     icon: "solar:check-read-linear",
