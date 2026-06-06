@@ -9,12 +9,13 @@ LINEAR_CONTAINS = ["issue", "create"]
 
 def _pick(tools: list[str], exact: list[str], contains_all: list[str]) -> str | None:
     for name in exact:
-        if name in tools:
-            return name
-    for name in tools:
-        low = name.lower()
+        for tool in tools:
+            if tool == name or tool.startswith(name):
+                return tool
+    for tool in tools:
+        low = tool.lower()
         if all(part in low for part in contains_all):
-            return name
+            return tool
     return None
 
 
