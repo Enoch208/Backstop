@@ -5,3 +5,5 @@ AGENTS.md
 docs/superpowers/
 .claude/
 .DS_Store
+ui.json
+backstop-prd.md
