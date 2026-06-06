@@ -9,6 +9,7 @@ from backstop import controller
 from backstop.config import settings
 from backstop.demo import demo_diagnoser
 from backstop.events import bus
+from backstop.llm import served_model
 from backstop.report import build_report
 from backstop.runner import execute_demo
 
@@ -53,6 +54,17 @@ async def events(run_id: str) -> EventSourceResponse:
 @app.get("/report/{run_id}")
 async def report(run_id: str):
     return build_report(bus.history(run_id))
+
+
+@app.get("/fallback-test")
+async def fallback_test(n: int = 6) -> dict:
+    calls = []
+    for _ in range(min(max(n, 1), 12)):
+        try:
+            calls.append(await asyncio.to_thread(served_model))
+        except Exception as exc:
+            calls.append(f"error: {type(exc).__name__}")
+    return {"calls": calls}
 
 
 @app.post("/reset")

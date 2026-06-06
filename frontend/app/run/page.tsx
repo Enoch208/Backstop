@@ -5,6 +5,7 @@ import { Icon } from "@iconify/react";
 import { API_BASE } from "../lib/api";
 import AgentColumn from "./AgentColumn";
 import ClusterWidget from "./ClusterWidget";
+import FallbackStrip from "./FallbackStrip";
 import ReceiptsPanel from "./ReceiptsPanel";
 import ReportCard from "./ReportCard";
 import Sidebar from "./Sidebar";
@@ -18,6 +19,7 @@ export default function RunPage() {
   const [runIds, setRunIds] = useState<RunIds | null>(null);
   const [busy, setBusy] = useState(false);
   const [report, setReport] = useState<IncidentReport | null>(null);
+  const [fallback, setFallback] = useState<string[] | null>(null);
 
   const naiveEvents = useRunStream(runIds?.naive ?? null);
   const hardenedEvents = useRunStream(runIds?.hardened ?? null);
@@ -35,9 +37,21 @@ export default function RunPage() {
     }
   };
 
+  const testFallback = async () => {
+    setBusy(true);
+    try {
+      const response = await fetch(`${API_BASE}/fallback-test?n=6`);
+      const body = await response.json();
+      setFallback(body.calls);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const reset = async () => {
     setRunIds(null);
     setReport(null);
+    setFallback(null);
     setBusy(true);
     try {
       await fetch(`${API_BASE}/reset`, { method: "POST" });
@@ -97,6 +111,15 @@ export default function RunPage() {
           <div className="flex items-center gap-3">
             <button
               type="button"
+              onClick={testFallback}
+              disabled={busy}
+              className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#131315] px-5 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:border-white/20 hover:text-white disabled:opacity-50"
+            >
+              <Icon icon="solar:routing-2-linear" className="text-base" />
+              Test fallback
+            </button>
+            <button
+              type="button"
               onClick={reset}
               disabled={busy}
               className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#131315] px-5 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:border-white/20 hover:text-white disabled:opacity-50"
@@ -117,6 +140,8 @@ export default function RunPage() {
         </header>
 
         <div className="flex flex-1 flex-col gap-6 p-8">
+          {fallback && <FallbackStrip calls={fallback} />}
+
           <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
             <StatCard
               icon="solar:shield-check-linear"

@@ -37,3 +37,13 @@ def diagnose(signals: Signals, model: str | None = None) -> Diagnosis:
     )
     content = response.choices[0].message.content or ""
     return Diagnosis.model_validate_json(_extract_json(content))
+
+
+def served_model() -> str:
+    response = _client().chat.completions.create(
+        model=settings.model,
+        messages=[{"role": "user", "content": "ping"}],
+        max_tokens=1,
+        extra_headers={"X-TFY-LOGGING-CONFIG": '{"enabled": true}'},
+    )
+    return str(response.model)
