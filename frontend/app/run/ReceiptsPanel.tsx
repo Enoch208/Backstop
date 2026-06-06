@@ -16,7 +16,7 @@ export default function ReceiptsPanel({ events }: { events: RunEvent[] }) {
   );
 
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-[#131315] p-6">
+    <div id="receipts" className="scroll-mt-6 rounded-2xl border border-white/[0.06] bg-[#131315] p-6">
       <h3 className="text-sm font-semibold text-white">TrueFoundry receipts</h3>
       <p className="mt-1 mb-5 text-[11px] font-extralight text-zinc-500">
         Capabilities engaged this run.
