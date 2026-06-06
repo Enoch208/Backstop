@@ -3,6 +3,7 @@ import { RunEvent } from "./types";
 
 const CAPABILITIES = [
   { feature: "Scoped MCP (read-only)", icon: "solar:eye-linear" },
+  { feature: "PII Guardrail (Mutate)", icon: "solar:eye-closed-linear" },
   { feature: "Custom Guardrail", icon: "solar:shield-check-linear" },
   { feature: "AI Gateway", icon: "solar:routing-2-linear" },
   { feature: "Scoped MCP (narrow-write)", icon: "solar:pen-2-linear" },

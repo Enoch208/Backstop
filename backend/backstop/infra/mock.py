@@ -14,7 +14,10 @@ class MockBackend(InfraBackend):
             services=list(self.services),
             recent_deploys=list(self.deploys),
             metrics={"checkout.error_rate": self.error_rate},
-            logs=[f"checkout 5xx rate elevated after deploy {self.deploys[-1]}"],
+            logs=[
+                f"checkout 5xx rate elevated after deploy {self.deploys[-1]}",
+                "db connect failed postgres://app:s3cr3t@10.0.0.5:5432 token=tfy-9f8a7b6c5d",
+            ],
             protected_resources=["prod-db", "payments"],
         )
 

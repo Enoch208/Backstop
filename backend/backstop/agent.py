@@ -13,6 +13,7 @@ from backstop.contracts import (
 from backstop.events import EventBus
 from backstop.events import bus as default_bus
 from backstop.guardrails.action import check_action
+from backstop.guardrails.pii import redact_signals
 from backstop.guardrails.quality import check_quality
 from backstop.infra.base import InfraBackend
 from backstop.llm import diagnose as llm_diagnose
@@ -86,6 +87,16 @@ async def run_hardened(
         f"error_rate={signals.metrics.get('checkout.error_rate')}",
         data={"metrics": signals.metrics, "feature": "Scoped MCP (read-only)"},
     )
+
+    signals, redactions = redact_signals(signals)
+    if redactions:
+        await out.emit(
+            EventKind.gate,
+            "Secrets redacted",
+            f"{redactions} secret(s) masked before the model saw them",
+            severity="green",
+            data={"feature": "PII Guardrail (Mutate)"},
+        )
 
     diagnosis = await asyncio.to_thread(diagnoser, signals, None)
     await out.emit(EventKind.step, "Diagnosis", diagnosis.hypothesis, data=diagnosis.model_dump())
