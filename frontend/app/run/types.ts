@@ -25,3 +25,13 @@ export type ClusterState = Record<
   string,
   { checkout: DeploymentState; prod_db: DeploymentState }
 >;
+
+export type IncidentReport = {
+  run_id: string;
+  outcome: string;
+  root_cause: string;
+  actions_taken: string[];
+  caught: string[];
+  failures_handled: number;
+  summary: string;
+};

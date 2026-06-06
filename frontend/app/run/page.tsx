@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import { API_BASE } from "../lib/api";
 import AgentColumn from "./AgentColumn";
 import ClusterWidget from "./ClusterWidget";
 import ReceiptsPanel from "./ReceiptsPanel";
+import ReportCard from "./ReportCard";
 import Sidebar from "./Sidebar";
 import StatCard from "./StatCard";
+import { IncidentReport } from "./types";
 import { useClusterState, useRunStream } from "./useRunStream";
 
 type RunIds = { naive: string; hardened: string };
@@ -15,6 +17,7 @@ type RunIds = { naive: string; hardened: string };
 export default function RunPage() {
   const [runIds, setRunIds] = useState<RunIds | null>(null);
   const [busy, setBusy] = useState(false);
+  const [report, setReport] = useState<IncidentReport | null>(null);
 
   const naiveEvents = useRunStream(runIds?.naive ?? null);
   const hardenedEvents = useRunStream(runIds?.hardened ?? null);
@@ -22,6 +25,7 @@ export default function RunPage() {
 
   const triggerIncident = async () => {
     setBusy(true);
+    setReport(null);
     try {
       const response = await fetch(`${API_BASE}/demo`, { method: "POST" });
       const body = await response.json();
@@ -33,6 +37,7 @@ export default function RunPage() {
 
   const reset = async () => {
     setRunIds(null);
+    setReport(null);
     setBusy(true);
     try {
       await fetch(`${API_BASE}/reset`, { method: "POST" });
@@ -58,6 +63,20 @@ export default function RunPage() {
     : runIds
       ? "Running"
       : "Idle";
+
+  useEffect(() => {
+    if (!runIds || !hardenedDone) return;
+    let active = true;
+    fetch(`${API_BASE}/report/${runIds.hardened}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (active) setReport(data);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [hardenedDone, runIds]);
 
   const deployments = cluster ? Object.values(cluster).flatMap((ns) => [ns.checkout, ns.prod_db]) : [];
   const healthy = deployments.filter((d) => d.desired > 0 && d.ready === d.desired).length;
@@ -156,6 +175,8 @@ export default function RunPage() {
               <ClusterWidget state={cluster} />
             </div>
           </div>
+
+          {report && <ReportCard report={report} />}
         </div>
       </div>
     </div>
