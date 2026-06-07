@@ -14,6 +14,29 @@ import { useClusterState, useRunStream } from "./useRunStream";
 
 type RunIds = { naive: string; hardened: string };
 
+const NAIVE_PIPELINE = [
+  { label: "Diagnose", note: "one model — trusts the first output" },
+  { label: "Execute", note: "every tool in hand, nothing checked" },
+];
+
+const HARDENED_PIPELINE = [
+  { label: "Gather signals", note: "read-only snapshot of the cluster" },
+  { label: "Redact secrets", note: "PII masked before the model sees it" },
+  { label: "Diagnose", note: "structured output via the AI Gateway" },
+  {
+    label: "Quality gate + LLM-as-judge",
+    note: "is the diagnosis grounded in evidence?",
+    gate: true,
+  },
+  {
+    label: "Action gate",
+    note: "blast radius · protected resources · evidence match",
+    gate: true,
+  },
+  { label: "Execute (scoped)", note: "only a validated write reaches the cluster" },
+  { label: "Notify", note: "page on-call + file a ticket via MCP Gateway" },
+];
+
 export default function RunPage() {
   const [runIds, setRunIds] = useState<RunIds | null>(null);
   const [busy, setBusy] = useState(false);
@@ -136,6 +159,56 @@ export default function RunPage() {
         </header>
 
         <div className="flex flex-1 flex-col gap-6 p-8">
+          {!runIds && (
+            <div className="flex flex-col gap-5 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-[#16161c] to-[#0d0d10] p-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-start gap-4">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#2563eb]/25 bg-[#2563eb]/10">
+                  <Icon
+                    icon="solar:shield-network-linear"
+                    className="text-2xl text-accent-2"
+                  />
+                </span>
+                <div>
+                  <h2 className="text-base font-medium text-white">
+                    A live incident drill — fail-safe, not just fail-over
+                  </h2>
+                  <p className="mt-1.5 max-w-2xl text-sm font-extralight leading-relaxed text-zinc-400">
+                    The same poisoned alert hits both agents. The naive one acts on
+                    a hallucinated diagnosis and takes the production database to
+                    zero. Backstop catches the bad output, re-routes to a stronger
+                    model, and rolls the real deploy back — on a live Kubernetes
+                    cluster, through the TrueFoundry gateway.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {[
+                      "Real Kubernetes",
+                      "AWS Bedrock",
+                      "Gateway + fallback",
+                      "MCP Gateway",
+                      "Guardrails",
+                    ].map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] text-zinc-400"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={triggerIncident}
+                disabled={busy}
+                className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow-[0_2px_18px_rgba(255,255,255,0.18)] transition-all hover:bg-zinc-100 active:scale-95 disabled:opacity-50"
+              >
+                <Icon icon="solar:bolt-linear" className="text-base" />
+                Run the drill
+              </button>
+            </div>
+          )}
+
           {fallback && <FallbackStrip calls={fallback} />}
 
           <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
@@ -181,6 +254,7 @@ export default function RunPage() {
                 tone="naive"
                 events={naiveEvents}
                 running={Boolean(runIds) && !naiveDone}
+                pipeline={NAIVE_PIPELINE}
               />
               <AgentColumn
                 title="Backstop"
@@ -188,6 +262,7 @@ export default function RunPage() {
                 tone="hardened"
                 events={hardenedEvents}
                 running={Boolean(runIds) && !hardenedDone}
+                pipeline={HARDENED_PIPELINE}
               />
             </div>
 
