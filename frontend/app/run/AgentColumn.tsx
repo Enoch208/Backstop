@@ -47,7 +47,7 @@ export default function AgentColumn({
       : "solar:danger-triangle-linear";
 
   return (
-    <div className="flex h-[30rem] flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-[#131315]">
+    <div className="flex h-full min-h-[30rem] flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-[#131315]">
       <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
         <div className="flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.06] bg-black/40">
