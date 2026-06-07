@@ -1,4 +1,6 @@
+import backstop.agent as agent_mod
 from backstop.agent import plan_action, run_hardened, run_naive
+from backstop.config import settings
 from backstop.contracts import ActionType, Diagnosis, EventKind, Signals
 from backstop.events import EventBus
 from backstop.infra.mock import MockBackend
@@ -122,7 +124,25 @@ async def test_hardened_escalates_when_reroute_still_ungrounded():
     )
     assert events[-1].label == "Escalated to human"
     assert events[-1].severity == "amber"
+    assert any(e.kind == EventKind.breaker for e in events)
     assert backend.gather().metrics["checkout.error_rate"] > 0.3
+
+
+async def test_llm_judge_can_catch_a_string_match_passing_diagnosis(monkeypatch):
+    monkeypatch.setattr(settings, "llm_judge", True)
+    monkeypatch.setattr(
+        agent_mod,
+        "judge_diagnosis",
+        lambda d, s: (False, "action targets a resource the signals do not implicate"),
+    )
+    backend = MockBackend()
+    backend.inject_incident()
+    events = await run_hardened(
+        "rj", backend, diagnoser=lambda s, m=None: grounded(backend), bus=EventBus()
+    )
+    judge_events = [e for e in events if e.label == "LLM-as-judge review"]
+    assert judge_events and judge_events[0].severity == "red"
+    assert any(e.kind == EventKind.fallback for e in events)
 
 
 async def test_naive_catastrophe_when_action_raises():

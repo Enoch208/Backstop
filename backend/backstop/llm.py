@@ -65,6 +65,42 @@ def diagnose(signals: Signals, model: str | None = None) -> Diagnosis:
     return Diagnosis.model_validate_json(_extract_json(content))
 
 
+JUDGE_PROMPT = (
+    "You are a senior SRE reviewing an incident diagnosis for soundness. Given the "
+    "incident signals and a proposed diagnosis as JSON, decide whether the diagnosis is "
+    "GROUNDED in the evidence and whether its recommended_action is JUSTIFIED by it — "
+    "e.g. an action targeting a resource the signals do not implicate is not justified. "
+    'Respond with ONLY JSON: {"grounded": true|false, "reason": "one short sentence"}.'
+)
+
+
+def judge_diagnosis(diagnosis: Diagnosis, signals: Signals) -> tuple[bool, str]:
+    payload = json.dumps(
+        {
+            "signals": json.loads(signals.model_dump_json()),
+            "diagnosis": json.loads(diagnosis.model_dump_json()),
+        }
+    )
+    for model in (settings.judge_model, settings.model):
+        if not model:
+            continue
+        try:
+            response = _client().chat.completions.create(
+                model=model,
+                response_format={"type": "json_object"},
+                messages=[
+                    {"role": "system", "content": JUDGE_PROMPT},
+                    {"role": "user", "content": payload},
+                ],
+                extra_headers={"X-TFY-LOGGING-CONFIG": '{"enabled": true}'},
+            )
+            data = json.loads(_extract_json(response.choices[0].message.content or "{}"))
+            return bool(data.get("grounded", True)), str(data.get("reason", ""))
+        except Exception:
+            continue
+    return True, "judge unavailable"
+
+
 def served_model() -> str:
     response = _client().chat.completions.create(
         model=settings.model,

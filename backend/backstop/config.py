@@ -20,6 +20,8 @@ class Settings:
     linear_team = os.getenv("BACKSTOP_LINEAR_TEAM", "")
     prompt_fqn = os.getenv("BACKSTOP_PROMPT_FQN", "")
     tfy_host = os.getenv("TFY_HOST", "https://backstop.truefoundry.cloud")
+    llm_judge = os.getenv("BACKSTOP_LLM_JUDGE", "false").lower() == "true"
+    breaker_budget = int(os.getenv("BACKSTOP_BREAKER_BUDGET", "2"))
 
 
 settings = Settings()

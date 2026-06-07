@@ -9,6 +9,7 @@ from backstop.contracts import (
     ProposedAction,
     RunEvent,
     Signals,
+    Verdict,
 )
 from backstop.events import EventBus
 from backstop.events import bus as default_bus
@@ -18,6 +19,7 @@ from backstop.guardrails.quality import check_quality
 from backstop.config import settings
 from backstop.infra.base import InfraBackend
 from backstop.llm import diagnose as llm_diagnose
+from backstop.llm import judge_diagnosis
 from backstop.notify import notify_incident
 
 Diagnoser = Callable[[Signals, str | None], Diagnosis]
@@ -78,7 +80,18 @@ async def run_hardened(
 ) -> list[RunEvent]:
     diagnoser = diagnoser or llm_diagnose
     out = _Emitter(bus or default_bus, run_id, "hardened")
-    breaker = CircuitBreaker(budget=3)
+    breaker = CircuitBreaker(budget=settings.breaker_budget)
+
+    async def record_anomaly() -> None:
+        breaker.record_anomaly()
+        if breaker.tripped:
+            await out.emit(
+                EventKind.breaker,
+                "Cascade circuit breaker tripped",
+                f"{breaker.anomalies} anomalies this run; halting autonomous action",
+                severity="red",
+                data={"feature": "Resilience"},
+            )
 
     await out.emit(EventKind.step, "Incident triggered", "Alert received; opening triage run")
 
@@ -112,8 +125,24 @@ async def run_hardened(
         data={"checks": quality.checks, "feature": "Custom Guardrail"},
     )
 
+    if settings.llm_judge:
+        grounded, reason = await asyncio.to_thread(judge_diagnosis, diagnosis, signals)
+        await out.emit(
+            EventKind.gate,
+            "LLM-as-judge review",
+            reason,
+            severity="green" if grounded else "red",
+            data={"feature": "AI Gateway"},
+        )
+        if not grounded:
+            quality = Verdict(
+                passed=False,
+                checks={**quality.checks, "llm_judge": False},
+                reasons=quality.reasons + [f"judge: {reason}"],
+            )
+
     if not quality.passed:
-        breaker.record_anomaly()
+        await record_anomaly()
         await out.emit(
             EventKind.blocked,
             "Hallucinated diagnosis caught",
@@ -139,6 +168,7 @@ async def run_hardened(
             data={"checks": quality.checks, "feature": "Custom Guardrail"},
         )
         if not quality.passed:
+            await record_anomaly()
             await out.emit(
                 EventKind.done,
                 "Escalated to human",
@@ -165,7 +195,7 @@ async def run_hardened(
     )
 
     if not verdict.passed:
-        breaker.record_anomaly()
+        await record_anomaly()
         await out.emit(
             EventKind.blocked,
             "Destructive action blocked",
@@ -184,7 +214,7 @@ async def run_hardened(
     try:
         result = await asyncio.to_thread(backend.apply, action)
     except Exception as exc:
-        breaker.record_anomaly()
+        await record_anomaly()
         await out.emit(EventKind.blocked, "Tool failure", str(exc), severity="red")
         await out.emit(
             EventKind.done,
