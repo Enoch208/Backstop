@@ -17,7 +17,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-60 shrink-0 flex-col border-r border-white/[0.06] bg-[#0b0b0d] px-4 py-6 lg:flex">
+    <aside className="hidden w-60 shrink-0 flex-col border-r border-white/[0.06] bg-[#0b0b0d] px-4 py-6 lg:sticky lg:top-0 lg:flex lg:h-screen lg:self-start lg:overflow-y-auto">
       <Link href="/run" className="px-2 pb-8">
         <Wordmark size={28} />
       </Link>
