@@ -14,6 +14,27 @@ import { useClusterState, useRunStream } from "./useRunStream";
 
 type RunIds = { naive: string; hardened: string };
 
+const SCENARIOS = [
+  {
+    id: "hallucination",
+    label: "Hallucinated diagnosis",
+    icon: "solar:ghost-linear",
+    note: "quality gate + LLM-judge catch the wrong output",
+  },
+  {
+    id: "cascade",
+    label: "Cascading failure",
+    icon: "solar:bolt-circle-linear",
+    note: "stays wrong → circuit breaker trips → escalate",
+  },
+  {
+    id: "clean",
+    label: "Clean signal",
+    icon: "solar:check-circle-linear",
+    note: "grounded diagnosis → every gate passes → resolve",
+  },
+];
+
 const NAIVE_PIPELINE = [
   { label: "Diagnose", note: "one model — trusts the first output" },
   { label: "Execute", note: "every tool in hand, nothing checked" },
@@ -47,11 +68,14 @@ export default function RunPage() {
   const hardenedEvents = useRunStream(runIds?.hardened ?? null);
   const cluster = useClusterState();
 
-  const triggerIncident = async () => {
+  const triggerIncident = async (scenario: string = "hallucination") => {
     setBusy(true);
     setReport(null);
+    setFallback(null);
     try {
-      const response = await fetch(`${API_BASE}/demo`, { method: "POST" });
+      const response = await fetch(`${API_BASE}/demo?scenario=${scenario}`, {
+        method: "POST",
+      });
       const body = await response.json();
       setRunIds({ naive: body.naive, hardened: body.hardened });
     } finally {
@@ -127,36 +151,45 @@ export default function RunPage() {
               Same alert, two agents — naive vs Backstop, on a real cluster.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <button
-              type="button"
-              onClick={testFallback}
-              disabled={busy}
-              className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#131315] px-5 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:border-white/20 hover:text-white disabled:opacity-50"
-            >
-              <Icon icon="solar:routing-2-linear" className="text-base" />
-              Test fallback
-            </button>
-            <button
-              type="button"
-              onClick={reset}
-              disabled={busy}
-              className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#131315] px-5 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:border-white/20 hover:text-white disabled:opacity-50"
-            >
-              <Icon icon="solar:restart-linear" className="text-base" />
-              Reset
-            </button>
-            <button
-              type="button"
-              onClick={triggerIncident}
-              disabled={busy}
-              className="flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black shadow-[0_2px_14px_rgba(255,255,255,0.14)] transition-all hover:bg-zinc-100 active:scale-95 disabled:opacity-50"
-            >
-              <Icon icon="solar:bolt-linear" className="text-base" />
-              Trigger incident
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={reset}
+            disabled={busy}
+            className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#131315] px-5 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:border-white/20 hover:text-white disabled:opacity-50"
+          >
+            <Icon icon="solar:restart-linear" className="text-base" />
+            Reset
+          </button>
         </header>
+
+        <div className="flex flex-wrap items-center gap-2 border-b border-white/[0.06] px-4 py-4 sm:px-6 lg:px-8">
+          <span className="mr-1 text-[11px] font-medium uppercase tracking-wider text-zinc-600">
+            Inject failure
+          </span>
+          {SCENARIOS.map((scenario) => (
+            <button
+              key={scenario.id}
+              type="button"
+              title={scenario.note}
+              onClick={() => triggerIncident(scenario.id)}
+              disabled={busy}
+              className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#131315] px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:border-white/20 hover:text-white disabled:opacity-50"
+            >
+              <Icon icon={scenario.icon} className="text-base" />
+              {scenario.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            title="6 rapid calls — watch the gateway fail Sonnet over to Llama"
+            onClick={testFallback}
+            disabled={busy}
+            className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#131315] px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:border-white/20 hover:text-white disabled:opacity-50"
+          >
+            <Icon icon="solar:routing-2-linear" className="text-base" />
+            Model failover
+          </button>
+        </div>
 
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
           {!runIds && (
@@ -199,7 +232,7 @@ export default function RunPage() {
               </div>
               <button
                 type="button"
-                onClick={triggerIncident}
+                onClick={() => triggerIncident("hallucination")}
                 disabled={busy}
                 className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow-[0_2px_18px_rgba(255,255,255,0.18)] transition-all hover:bg-zinc-100 active:scale-95 disabled:opacity-50"
               >

@@ -7,7 +7,7 @@ from sse_starlette.sse import EventSourceResponse
 
 from backstop import controller
 from backstop.config import settings
-from backstop.demo import demo_diagnoser
+from backstop.demo import SCENARIOS, scenario_diagnoser
 from backstop.events import bus
 from backstop.llm import served_model
 from backstop.report import build_report
@@ -25,7 +25,8 @@ _recent_runs: list[dict] = []
 
 
 @app.post("/demo")
-async def demo() -> dict:
+async def demo(scenario: str = "hallucination") -> dict:
+    scenario = scenario if scenario in SCENARIOS else "hallucination"
     demo_id = uuid.uuid4().hex[:8]
     naive_id = f"naive-{demo_id}"
     hardened_id = f"hardened-{demo_id}"
@@ -40,12 +41,17 @@ async def demo() -> dict:
             hardened_backend,
             naive_id,
             hardened_id,
-            demo_diagnoser(),
+            scenario_diagnoser(scenario, settings.live),
             bus,
             settings.settle_seconds,
         )
     )
-    return {"demo_id": demo_id, "naive": naive_id, "hardened": hardened_id}
+    return {
+        "demo_id": demo_id,
+        "naive": naive_id,
+        "hardened": hardened_id,
+        "scenario": scenario,
+    }
 
 
 @app.get("/runs")

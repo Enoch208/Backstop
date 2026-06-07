@@ -28,23 +28,25 @@ def _grounded(signals: Signals) -> Diagnosis:
     )
 
 
-def scripted_diagnoser():
+SCENARIOS = ("hallucination", "cascade", "clean")
+
+
+def scenario_diagnoser(scenario: str, live: bool):
     def diagnoser(signals: Signals, model: str | None = None) -> Diagnosis:
-        if model == "stronger":
+        if scenario == "clean":
             return _grounded(signals)
-        return _hallucinated(signals)
-
-    return diagnoser
-
-
-def live_diagnoser():
-    def diagnoser(signals: Signals, model: str | None = None) -> Diagnosis:
+        if scenario == "cascade":
+            return _hallucinated(signals)
         if model == "stronger":
-            return llm.diagnose(signals)
+            return llm.diagnose(signals) if live else _grounded(signals)
         return _hallucinated(signals)
 
     return diagnoser
+
+
+def scripted_diagnoser():
+    return scenario_diagnoser("hallucination", live=False)
 
 
 def demo_diagnoser():
-    return live_diagnoser() if settings.live else scripted_diagnoser()
+    return scenario_diagnoser("hallucination", settings.live)
