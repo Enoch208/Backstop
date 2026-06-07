@@ -37,10 +37,27 @@ def _client() -> OpenAI:
 
 def _extract_json(text: str) -> str:
     start = text.find("{")
-    end = text.rfind("}")
-    if start == -1 or end == -1:
+    if start == -1:
         return text
-    return text[start : end + 1]
+    depth = 0
+    in_string = False
+    escape = False
+    for i in range(start, len(text)):
+        char = text[i]
+        if escape:
+            escape = False
+        elif char == "\\":
+            escape = True
+        elif char == '"':
+            in_string = not in_string
+        elif not in_string:
+            if char == "{":
+                depth += 1
+            elif char == "}":
+                depth -= 1
+                if depth == 0:
+                    return text[start : i + 1]
+    return text[start:]
 
 
 def _messages(signals: Signals) -> list[dict]:
