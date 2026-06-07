@@ -4,12 +4,12 @@
 
 &nbsp;
 
-![tests](https://img.shields.io/badge/tests-60%20passing-22c55e?style=flat-square&labelColor=18181b)
-![python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&labelColor=18181b)
-![next](https://img.shields.io/badge/Next.js-16-black?style=flat-square&labelColor=18181b)
-![gateway](https://img.shields.io/badge/AI%20Gateway-TrueFoundry-2563eb?style=flat-square&labelColor=18181b)
-![bedrock](https://img.shields.io/badge/models-AWS%20Bedrock-FF9900?style=flat-square&labelColor=18181b)
-![deployment](https://img.shields.io/badge/deployment-live-22c55e?style=flat-square&labelColor=18181b)
+[![CI](https://github.com/Enoch208/Backstop/actions/workflows/ci.yml/badge.svg)](https://github.com/Enoch208/Backstop/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Tests](https://img.shields.io/badge/tests-60%20passing-10b981)
+![AI Gateway](https://img.shields.io/badge/AI%20Gateway-TrueFoundry-2563eb)
+![Models](https://img.shields.io/badge/models-AWS%20Bedrock-FF9900)
+![Stack](https://img.shields.io/badge/Python%203.12%20·%20Next.js%2016%20·%20kind-1f1f23)
 
 ### An on-call SRE incident agent that catches a confident, _wrong_ model output — before it becomes a destructive action.
 
