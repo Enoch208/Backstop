@@ -14,7 +14,7 @@ export default function Wordmark({
   size = 30,
 }: WordmarkProps) {
   return (
-    <span className={`group inline-flex items-center ${className}`}>
+    <span className={`group inline-flex items-baseline ${className}`}>
       <Image
         src="/logo-mark.png"
         alt="Backstop"
@@ -25,7 +25,7 @@ export default function Wordmark({
       {!markOnly && (
         <span
           className="font-light tracking-[-0.04em] text-white"
-          style={{ fontSize: `${size}px`, lineHeight: 1 }}
+          style={{ fontSize: `${Math.round(size * 1.36)}px`, lineHeight: 1 }}
         >
           ackstop
         </span>
