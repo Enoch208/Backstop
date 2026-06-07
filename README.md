@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/hero.png" alt="Backstop — fails safe, not just stays up" width="100%" />
+<img src="assets/cover.png" alt="Backstop — fails safe, not just stays up" width="100%" />
 
 &nbsp;
 
