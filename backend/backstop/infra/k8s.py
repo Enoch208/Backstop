@@ -146,3 +146,6 @@ class K8sBackend(InfraBackend):
             if desired and ready == desired:
                 return
             time.sleep(2)
+        raise RuntimeError(
+            f"{deployment} did not reach ready state within {timeout}s; remediation failed"
+        )

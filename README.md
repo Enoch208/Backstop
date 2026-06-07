@@ -48,6 +48,8 @@ A Python triage agent that:
 
 I run it on a **local `kind` cluster with two namespaces** (`backstop-naive`, `backstop-hardened`), each with a `checkout` deployment and a protected `prod-db`. To create an incident I patch `checkout` to a non-existent image tag (`nginx:9.99-doesnotexist`), which produces a real `ImagePullBackOff` and zero ready pods — a genuine failure the agent has to reason about, not a mocked string.
 
+**A note on the failure I inject — and what's honest about it.** This is controlled fault injection, the way you'd run a chaos experiment. The cluster break is real, and so is the remediation. The *poisoned diagnosis* (the "restart prod-db" hallucination) I inject deterministically so both agents face the **identical bad intermediate output** — that's the variable I'm isolating, and it makes the guardrail's catch reproducible on every run rather than something I have to hope the model does on camera. With `BACKSTOP_LIVE=true`, the re-diagnosis on the re-route, the LLM-as-judge, and the recovery all run against the live model on the gateway; only the first deliberately-bad output is scripted. I'm explicit about this because the point isn't "watch the model hallucinate" — it's "watch what happens to a wrong output *when* it occurs."
+
 ## Architecture
 
 ```mermaid
