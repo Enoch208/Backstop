@@ -1,12 +1,31 @@
-# Backstop
+<div align="center">
 
-**An on-call SRE incident agent that fails safe — not just stays up.**
+<img src="assets/banner.png" alt="Backstop — fails safe, not just stays up" width="100%" />
 
-I built Backstop for the Resilient Agents hackathon (TrueFoundry × AWS Bedrock). Most takes on "resilient agents" answer one question: *what happens when the model goes down?* I wanted to answer the harder one I've actually watched cause outages: **what happens when the model is *up*, confident, and *wrong* — and the agent is about to act on it?**
+&nbsp;
 
-Backstop watches a production incident, diagnoses the root cause with an LLM, and remediates it on a **real Kubernetes cluster** — but I engineered it so that a hallucinated diagnosis, a rate limit, a provider outage, a failed tool, or a cascade of small errors can **never** turn into a destructive action. It stays online *and* it refuses to do the dumb thing.
+![tests](https://img.shields.io/badge/tests-60%20passing-22c55e?style=flat-square&labelColor=18181b)
+![python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&labelColor=18181b)
+![next](https://img.shields.io/badge/Next.js-16-black?style=flat-square&labelColor=18181b)
+![gateway](https://img.shields.io/badge/AI%20Gateway-TrueFoundry-2563eb?style=flat-square&labelColor=18181b)
+![bedrock](https://img.shields.io/badge/models-AWS%20Bedrock-FF9900?style=flat-square&labelColor=18181b)
+![deployment](https://img.shields.io/badge/deployment-live-22c55e?style=flat-square&labelColor=18181b)
 
-The demo I built runs **two agents against the same alert, side by side**: a *naive* agent (one model, every tool, no checks) and *Backstop*. The naive agent acts on a poisoned diagnosis and takes the production database to zero. Backstop gets the exact same bad diagnosis, catches it, re-routes to a stronger model, validates the fix, and rolls the bad deploy back — live, on the cluster, ending at `error_rate = 0.0`.
+### An on-call SRE incident agent that catches a confident, _wrong_ model output — before it becomes a destructive action.
+
+Most "resilient agent" designs answer one question: _what happens when the model goes down?_ Backstop answers the harder one — **what happens when the model is up, confident, and _wrong_, and the agent is about to act on it?** It diagnoses and remediates a live incident on a **real Kubernetes cluster**, through the TrueFoundry **AI Gateway · MCP Gateway · Guardrails** over **AWS Bedrock** — engineered so a bad output can never reach prod.
+
+**[ See it live ↗ ](#)** &nbsp;·&nbsp; **[ Watch the demo ↗ ](#-demo)** &nbsp;·&nbsp; **[ Read the docs ↓ ](#table-of-contents)**
+
+</div>
+
+---
+
+## ▶ Demo
+
+> 📹 **[Watch the 3-minute demo →](#)** &nbsp;—&nbsp; _link added after recording_
+
+The same alert hits two agents on one **real Kubernetes cluster**. The naive agent acts on a hallucinated diagnosis and takes the production database to zero. **Backstop** gets the exact same bad output, catches it with an LLM-as-judge, re-routes to a stronger model, and rolls the bad deploy back — ending at `error_rate = 0.0`, with a tamper-evident receipt of every step.
 
 ---
 
