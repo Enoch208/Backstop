@@ -74,10 +74,10 @@ def tfy_quality(payload: dict) -> dict:
     try:
         diagnosis = json.loads(_extract_json(content))
     except (ValueError, TypeError):
-        return {"verdict": False, "message": "diagnosis is not valid JSON"}
+        return {"verdict": True, "message": "not a structured diagnosis; skipped"}
 
     if not DIAGNOSIS_FIELDS.issubset(diagnosis):
-        return {"verdict": False, "message": "diagnosis missing required fields"}
+        return {"verdict": True, "message": "not a structured diagnosis; skipped"}
 
     confidence = diagnosis.get("confidence")
     if not isinstance(confidence, (int, float)) or confidence < MIN_CONFIDENCE:

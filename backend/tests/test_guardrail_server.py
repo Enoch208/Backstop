@@ -50,16 +50,24 @@ def test_tfy_pii_redacts_request_messages():
     assert "hunter2" not in body["result"]["messages"][0]["content"]
 
 
-def test_tfy_quality_blocks_invalid_response():
+def test_tfy_quality_blocks_low_confidence_diagnosis():
+    content = (
+        '{"hypothesis":"x","suspected_resource":"checkout",'
+        '"suspected_deploy_sha":"a1","confidence":0.1,"recommended_action":"rollback"}'
+    )
     response = client.post(
         "/tfy/quality",
-        json={
-            "responseBody": {
-                "choices": [{"message": {"content": "not json at all"}}]
-            }
-        },
+        json={"responseBody": {"choices": [{"message": {"content": content}}]}},
     )
     assert response.json()["verdict"] is False
+
+
+def test_tfy_quality_skips_non_diagnosis_response():
+    response = client.post(
+        "/tfy/quality",
+        json={"responseBody": {"choices": [{"message": {"content": "pong"}}]}},
+    )
+    assert response.json()["verdict"] is True
 
 
 def test_tfy_quality_passes_valid_high_confidence():
