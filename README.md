@@ -127,7 +127,8 @@ A few things I'm proud of, and the bugs that taught me something:
 - **The failover-parsing bug — my favourite catch.** Under the rate limit, the gateway fails over to Llama, which wraps JSON in markdown fences *and* trailing prose. My naive "first `{` to last `}`" extractor choked on that, which meant my diagnosis was quietly fragile *exactly during failover* — the worst possible time. I rewrote `_extract_json` as a **balanced-brace scanner that respects string escapes** and returns the first complete JSON object, so the whole Sonnet→Llama→Nova chain degrades cleanly regardless of formatting.
 - **Cascade circuit breaker.** An anomaly budget tracks failures across a run; once it trips, the agent halts autonomous action and escalates instead of amplifying a cascade.
 - **Real, reversible chaos.** `inject_incident` patches a bad image; `apply` rolls back to the *actual previous ReplicaSet image* and waits for the rollout — no fake "healed" flags. The mock backend mirrors the same newest-first deploy ordering as the real one so behaviour is identical across both.
-- **Hermetic tests.** A `conftest.py` fixture disables every network-dependent setting, so the 56-test suite runs in ~2s and never touches the gateway.
+- **Verifiable by default.** Every run emits a tamper-evident audit receipt (hash-chained over the event timeline), so a reviewer can confirm exactly which models, guardrails, and tools fired without trusting my word for it.
+- **Hermetic tests.** A `conftest.py` fixture disables every network-dependent setting, so the 60-test suite runs in ~2s and never touches the gateway.
 
 ## Resilience: the failure taxonomy
 
@@ -145,7 +146,21 @@ A few things I'm proud of, and the bugs that taught me something:
 
 ## The live console
 
-The `/run` console is a live view of the agent's decision trail: trigger an incident, watch the *naive* and *Backstop* columns stream side by side, see the capability panel light up each platform feature as it engages, watch real ready-replica counts diverge between the two namespaces, and read an auto-generated incident report. There are sub-pages for **Cluster** (live deployment health), **Guardrails** (every check and what it enforces), and **Incidents** (run history); **Observability** links straight to the gateway's monitoring.
+The `/run` console is a live view of the agent's decision trail. A **scenario bar** lets you inject any failure mode with one click and watch a *different* defense fire:
+
+| Scenario | What fires |
+|---|---|
+| **Hallucinated diagnosis** | quality gate + LLM-as-judge catch the wrong output → re-route → resolve |
+| **Cascading failure** | a diagnosis that stays wrong → circuit breaker trips → escalate |
+| **Tool failure** | the cluster API fails mid-action → the naive agent crashes, Backstop catches it and escalates |
+| **Clean signal** | a grounded diagnosis → every gate passes → resolve (proves no false-positives) |
+| **Model failover** | the gateway fails the primary over to the next model, live |
+
+Each run streams the *naive* and *Backstop* columns side by side, lights up the capability panel as each platform feature engages, shows real ready-replica counts diverge between the two namespaces, and ends with an auto-generated incident report.
+
+Every run also produces a **tamper-evident Incident Receipt** — a downloadable JSON audit of exactly what happened: which platform capabilities engaged, every guardrail decision, the actions blocked vs executed, the fallbacks fired, and the full event timeline, stamped with a **SHA-256 integrity hash** anyone can recompute from the timeline. It's the verifiable record that the agent did what it claims.
+
+There are sub-pages for **Cluster** (live deployment health), **Guardrails** (every check and what it enforces), and **Incidents** (run history); **Observability** links straight to the gateway's monitoring. The console is self-explaining when idle (it renders both agents' full pipelines before you trigger anything) and fully responsive on mobile.
 
 ## Tech stack
 
@@ -165,9 +180,9 @@ backend/
     prompts.py            # managed-prompt fetch (with local fallback)
     breaker.py            # anomaly-budget circuit breaker
     events.py             # SSE event bus with replay
-    report.py             # incident report generator
+    report.py             # incident report + tamper-evident audit receipt
     runner.py             # naive-vs-hardened orchestration
-    api.py                # run API (demo, events, state, runs, report, reset, fallback-test)
+    api.py                # run API (demo+scenario, events, state, runs, report, receipt, reset, fallback)
     notify.py             # MCP notify / ticket step
     mcp.py                # MCP gateway client
     infra_mcp.py          # read-only custom infra MCP server (FastMCP)
@@ -181,7 +196,7 @@ backend/
       k8s.py              # real Kubernetes backend
       mock.py             # deterministic test backend
   k8s/                    # sandbox manifests (checkout + prod-db)
-  tests/                  # 56-test suite, network-isolated
+  tests/                  # 60-test suite, network-isolated
 frontend/
   app/
     components/           # landing page
@@ -222,7 +237,7 @@ I host the backend on a VPS so the custom guardrails and custom MCP server have 
 ## Tests
 
 ```bash
-cd backend && uv run pytest    # 56 passed in ~2s
+cd backend && uv run pytest    # 60 passed in ~2s
 ```
 
-The suite covers the contracts, both guardrails, the redactor, the breaker, the event bus, the JSON extractor (including verbose-failover output), the agent's happy path and every failure branch, the runner, the report generator, the prompt fallback, and the platform-compatible guardrail endpoints. The Kubernetes backend is verified end-to-end against a live cluster.
+The suite covers the contracts, both guardrails, the redactor, the breaker, the event bus, the JSON extractor (including verbose-failover output), the agent's happy path and every failure branch, each injectable scenario, the runner, the report generator, the tamper-evident receipt, the prompt fallback, and the platform-compatible guardrail endpoints. The Kubernetes backend is verified end-to-end against a live cluster.
