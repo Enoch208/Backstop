@@ -1,5 +1,17 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
+import { API_BASE } from "../lib/api";
 import { IncidentReport } from "./types";
+
+type IncidentReceipt = {
+  run_id: string;
+  scenario: string;
+  integrity_sha256: string;
+  features_engaged: string[];
+  issued_at: string;
+};
 
 const OUTCOME: Record<string, { label: string; className: string }> = {
   resolved: {
@@ -38,6 +50,33 @@ function Section({
 
 export default function ReportCard({ report }: { report: IncidentReport }) {
   const outcome = OUTCOME[report.outcome] ?? OUTCOME.running;
+  const [receipt, setReceipt] = useState<IncidentReceipt | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch(`${API_BASE}/receipt/${report.run_id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (active) setReceipt(data);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [report.run_id]);
+
+  const downloadReceipt = () => {
+    if (!receipt) return;
+    const blob = new Blob([JSON.stringify(receipt, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `backstop-receipt-${report.run_id}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div id="report" className="scroll-mt-6 rounded-2xl border border-white/[0.06] bg-[#131315] p-7">
@@ -53,11 +92,22 @@ export default function ReportCard({ report }: { report: IncidentReport }) {
             </p>
           </div>
         </div>
-        <span
-          className={`rounded-full border px-3 py-1 text-xs font-medium ${outcome.className}`}
-        >
-          {outcome.label}
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={downloadReceipt}
+            disabled={!receipt}
+            className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#0b0b0d] px-4 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:border-white/20 hover:text-white disabled:opacity-40"
+          >
+            <Icon icon="solar:download-minimalistic-linear" className="text-sm" />
+            Audit receipt
+          </button>
+          <span
+            className={`rounded-full border px-3 py-1 text-xs font-medium ${outcome.className}`}
+          >
+            {outcome.label}
+          </span>
+        </div>
       </div>
 
       <p className="mb-7 text-lg font-light text-zinc-200">{report.summary}</p>
@@ -107,6 +157,28 @@ export default function ReportCard({ report }: { report: IncidentReport }) {
           )}
         </Section>
       </div>
+
+      {receipt && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-4">
+          <div className="flex items-center gap-2 text-[11px] font-extralight text-zinc-500">
+            <Icon icon="solar:shield-check-linear" className="text-accent-2" />
+            Tamper-evident receipt · sha256{" "}
+            <span className="font-mono text-zinc-400">
+              {receipt.integrity_sha256.slice(0, 16)}…
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {receipt.features_engaged.map((feature) => (
+              <span
+                key={feature}
+                className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 text-[10px] text-zinc-400"
+              >
+                {feature}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

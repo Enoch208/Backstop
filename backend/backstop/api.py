@@ -1,5 +1,6 @@
 import asyncio
 import uuid
+from datetime import datetime, timezone
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +11,7 @@ from backstop.config import settings
 from backstop.demo import SCENARIOS, scenario_diagnoser
 from backstop.events import bus
 from backstop.llm import served_model
-from backstop.report import build_report
+from backstop.report import build_receipt, build_report
 from backstop.runner import execute_demo
 
 app = FastAPI(title="Backstop")
@@ -31,7 +32,13 @@ async def demo(scenario: str = "hallucination") -> dict:
     naive_id = f"naive-{demo_id}"
     hardened_id = f"hardened-{demo_id}"
     _recent_runs.insert(
-        0, {"demo_id": demo_id, "naive": naive_id, "hardened": hardened_id}
+        0,
+        {
+            "demo_id": demo_id,
+            "naive": naive_id,
+            "hardened": hardened_id,
+            "scenario": scenario,
+        },
     )
     del _recent_runs[20:]
     naive_backend, hardened_backend = controller.make_backends()
@@ -88,6 +95,23 @@ async def events(run_id: str) -> EventSourceResponse:
 @app.get("/report/{run_id}")
 async def report(run_id: str):
     return build_report(bus.history(run_id))
+
+
+@app.get("/receipt/{run_id}")
+async def receipt(run_id: str):
+    scenario = next(
+        (
+            run["scenario"]
+            for run in _recent_runs
+            if run_id in (run["hardened"], run["naive"])
+        ),
+        "",
+    )
+    return build_receipt(
+        bus.history(run_id),
+        scenario=scenario,
+        issued_at=datetime.now(timezone.utc).isoformat(),
+    )
 
 
 @app.get("/fallback-test")

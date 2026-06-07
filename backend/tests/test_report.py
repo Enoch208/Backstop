@@ -2,7 +2,7 @@ from backstop.agent import run_hardened, run_naive
 from backstop.demo import scripted_diagnoser
 from backstop.events import EventBus
 from backstop.infra.mock import MockBackend
-from backstop.report import build_report
+from backstop.report import build_receipt, build_report
 
 
 async def test_report_for_resolved_run_after_catch():
@@ -36,3 +36,20 @@ def test_report_for_empty_history():
     report = build_report([])
     assert report.outcome == "running"
     assert report.root_cause == "undetermined"
+
+
+async def test_receipt_is_complete_and_tamper_evident():
+    backend = MockBackend()
+    backend.inject_incident()
+    bus = EventBus()
+    await run_hardened("rcpt", backend, diagnoser=scripted_diagnoser(), bus=bus)
+    events = bus.history("rcpt")
+
+    first = build_receipt(events, scenario="hallucination")
+    second = build_receipt(events, scenario="hallucination")
+
+    assert first.integrity_sha256 == second.integrity_sha256
+    assert len(first.integrity_sha256) == 64
+    assert first.features_engaged
+    assert first.guardrail_decisions
+    assert first.timeline[0]["label"] == "Incident triggered"
