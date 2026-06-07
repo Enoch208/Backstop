@@ -57,7 +57,7 @@ export default function Navbar() {
           className="transition-transform active:scale-95"
           aria-label="Backstop home"
         >
-          <Wordmark size={scrolled ? 27 : 30} />
+          <Wordmark size={scrolled ? 20 : 23} />
         </a>
 
         {/* Equal flex spacers on each side keep the links optically centered in
