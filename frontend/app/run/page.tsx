@@ -246,8 +246,8 @@ export default function RunPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_20rem]">
-            <div id="incidents" className="grid scroll-mt-6 grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[1fr_20rem]">
+            <div id="incidents" className="grid scroll-mt-6 grid-cols-1 items-start gap-6 lg:grid-cols-2">
               <AgentColumn
                 title="Naive agent"
                 subtitle="one model · all tools · no guardrails"

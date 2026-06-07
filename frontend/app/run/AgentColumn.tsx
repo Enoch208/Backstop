@@ -40,6 +40,7 @@ export default function AgentColumn({
 }: AgentColumnProps) {
   const done = events.find((event) => event.kind === "done");
   const outcome = done ? OUTCOME[done.severity] : null;
+  const hasEvents = events.length > 0;
   const accent = tone === "hardened" ? "text-accent-2" : "text-red-400";
   const icon =
     tone === "hardened"
@@ -47,7 +48,11 @@ export default function AgentColumn({
       : "solar:danger-triangle-linear";
 
   return (
-    <div className="flex h-full min-h-[30rem] flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-[#131315]">
+    <div
+      className={`flex flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-[#131315] ${
+        hasEvents ? "h-[32rem]" : ""
+      }`}
+    >
       <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
         <div className="flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.06] bg-black/40">
