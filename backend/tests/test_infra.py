@@ -13,7 +13,7 @@ def test_mock_inject_then_rollback_heals():
     backend = MockBackend()
     backend.inject_incident()
     assert backend.gather().metrics["checkout.error_rate"] > 0.3
-    bad = backend.gather().recent_deploys[-1]
+    bad = backend.gather().recent_deploys[0]
     backend.apply(ProposedAction(type=ActionType.rollback_deploy, target=bad))
     assert backend.gather().metrics["checkout.error_rate"] < 0.05
 

@@ -11,7 +11,7 @@ def grounded(backend: MockBackend) -> Diagnosis:
     return Diagnosis(
         hypothesis="bad deploy raised checkout errors",
         suspected_resource="checkout",
-        suspected_deploy_sha=signals.recent_deploys[-1],
+        suspected_deploy_sha=signals.recent_deploys[0],
         confidence=0.9,
         recommended_action="rollback the bad deploy",
     )
@@ -32,7 +32,7 @@ def destructive(backend: MockBackend) -> Diagnosis:
     return Diagnosis(
         hypothesis="roll everything back",
         suspected_resource="checkout",
-        suspected_deploy_sha=signals.recent_deploys[-1],
+        suspected_deploy_sha=signals.recent_deploys[0],
         confidence=0.9,
         recommended_action="rollback all deploys everywhere",
     )
@@ -100,7 +100,7 @@ def unknown_target(backend: MockBackend) -> Diagnosis:
     return Diagnosis(
         hypothesis="ghost service",
         suspected_resource="ghost",
-        suspected_deploy_sha=signals.recent_deploys[-1],
+        suspected_deploy_sha=signals.recent_deploys[0],
         confidence=0.9,
         recommended_action="restart ghost now",
     )
