@@ -1,0 +1,10 @@
+ingress:
+  - hostname: backstop.YOURDOMAIN.com
+    service: http://localhost:3033
+  - hostname: api.backstop.YOURDOMAIN.com
+    service: http://localhost:8033
+  - hostname: guardrails.backstop.YOURDOMAIN.com
+    service: http://localhost:8133
+  - hostname: mcp.backstop.YOURDOMAIN.com
+    service: http://localhost:8233
+  - service: http_status:404
