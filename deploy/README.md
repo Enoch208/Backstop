@@ -8,10 +8,10 @@ the dashboard is live.
 
 | Subdomain | Service | Port |
 |---|---|---|
-| `DOMAIN` | frontend (landing + `/run`) | 3000 |
-| `api.DOMAIN` | run API (`/demo`, SSE) | 8080 |
-| `guardrails.DOMAIN` | guardrail server (`/tfy/pii`, `/tfy/quality`) | 8081 |
-| `mcp.DOMAIN` | custom Infra MCP (`/mcp`) | 8090 |
+| `DOMAIN` | frontend (landing + `/run`) | 3033 |
+| `api.DOMAIN` | run API (`/demo`, SSE) | 8033 |
+| `guardrails.DOMAIN` | guardrail server (`/tfy/pii`, `/tfy/quality`) | 8133 |
+| `mcp.DOMAIN` | custom Infra MCP (`/mcp`) | 8233 |
 
 ## 1. DNS
 

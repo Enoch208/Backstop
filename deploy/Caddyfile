@@ -1,15 +1,15 @@
 {$DOMAIN} {
-	reverse_proxy 127.0.0.1:3000
+	reverse_proxy 127.0.0.1:3033
 }
 
 api.{$DOMAIN} {
-	reverse_proxy 127.0.0.1:8080
+	reverse_proxy 127.0.0.1:8033
 }
 
 guardrails.{$DOMAIN} {
-	reverse_proxy 127.0.0.1:8081
+	reverse_proxy 127.0.0.1:8133
 }
 
 mcp.{$DOMAIN} {
-	reverse_proxy 127.0.0.1:8090
+	reverse_proxy 127.0.0.1:8233
 }
