@@ -93,7 +93,7 @@ Every step is failure-aware. This is the hardened path:
 2. **Gather (read-only).** Pull signals from the cluster. Nothing destructive is reachable on this path.
 3. **Redact.** Secrets and PII in the gathered logs are masked *before the model sees them*.
 4. **Diagnose.** The gateway routes to the primary model and returns a structured `Diagnosis`.
-5. **Quality gate.** Is the diagnosis grounded? `suspected_resource` must be a real service, `suspected_deploy_sha` must be a real recent deploy, confidence must clear a threshold. **Fail → re-route** to a stronger model and re-diagnose; if it's still ungrounded, degrade gracefully and hand off to a human.
+5. **Quality gate.** Is the diagnosis grounded? `suspected_resource` must be a real service, `suspected_deploy_sha` must be a real recent deploy, confidence must clear a threshold. An independent **LLM-as-judge** then reasons about whether the recommended action is actually *justified by the evidence* — catching plausible-but-wrong diagnoses a rule check alone would miss. **Fail → re-route** to a stronger model and re-diagnose; if it's still ungrounded, degrade gracefully and hand off to a human.
 6. **Plan.** Turn the validated diagnosis into a typed `ProposedAction`.
 7. **Action gate.** Before any write: reject `scope=all` (blast radius), reject protected resources (`prod-db`, `payments`), confirm the target exists, and confirm the action actually matches the evidence. **Fail → block and escalate** — the destructive action simply never runs.
 8. **Execute (scoped write).** Only a validated action runs, against the real cluster, through a narrow write path.
@@ -113,8 +113,8 @@ Resilience here means more than "stay online" — it means *degrade safely* acro
 | **Model / provider outage** | The same priority chain: Claude Sonnet → Llama → Nova → Haiku, each with retry/fallback on `401/403/404/408/429/5xx`. |
 | **Slow responses** | Gateway-level routing and timeouts fail over instead of hanging. |
 | **Tool failures** | Caught per-call; the run degrades to a human hand-off with full context rather than crashing. |
-| **Bad intermediate outputs** | The **quality gate** catches ungrounded diagnoses and re-routes to a stronger model — the headline defense. |
-| **Cascading errors** | An **anomaly budget** tracks failures across steps; the agent stops escalating risk and hands off instead of amplifying. |
+| **Bad intermediate outputs** | The **quality gate** — rule-based groundedness checks *plus* an independent **LLM-as-judge** — catches ungrounded diagnoses and re-routes to a stronger model. The headline defense. |
+| **Cascading errors** | An **anomaly-budget circuit breaker** trips after repeated failures in a run, halts autonomous action, and escalates with full context — instead of amplifying the cascade. |
 | **Destructive actions** | The **action gate** plus scoped tools make a catastrophic write structurally unreachable. |
 | **Cost blow-ups** | A cheap model does the validation work, a budget cap guards spend, and a loop cap bounds runaway iterations. |
 | **State** | Every step is event-sourced into a replayable per-run history; on failure the agent escalates *with* that state instead of losing it. |
@@ -140,7 +140,7 @@ Every capability below is wired through the platform, not faked.
 
 - **Input — redact:** native **Secrets Detection** and **PII/PHI** guardrails mask credentials and sensitive data on the request path.
 - **Output — validate:** a **custom guardrail** validates the model's diagnosis for schema and confidence on the response path.
-- **In-agent — the core fail-safe logic:** the groundedness (quality) and blast-radius/justification (action) checks run in the agent itself, as pure tested functions, so a wrong output cannot reach the cluster.
+- **In-agent — the core fail-safe logic:** the groundedness (quality) and blast-radius/justification (action) checks run in the agent itself, as pure tested functions, backed by an **LLM-as-judge** that independently reasons about whether the action follows from the evidence — so a wrong output cannot reach the cluster.
 
 ### Prompts
 
