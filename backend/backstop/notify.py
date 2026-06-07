@@ -19,12 +19,14 @@ def _pick(tools: list[str], exact: list[str], contains_all: list[str]) -> str | 
     return None
 
 
-async def _call(tool: str, arguments: dict, label: str) -> tuple[str, str, bool]:
+async def _call(
+    tool: str, arguments: dict, label: str, ok_detail: str
+) -> tuple[str, str, bool]:
     try:
         await mcp.call_tool(tool, arguments)
-        return (label, f"via MCP tool {tool}", True)
+        return (label, ok_detail, True)
     except Exception as exc:
-        return (label, f"{tool} failed: {str(exc)[:80]}", False)
+        return (label, f"{label.lower()} failed: {str(exc)[:80]}", False)
 
 
 async def notify_incident(headline: str, detail: str) -> list[tuple[str, str, bool]]:
@@ -43,6 +45,7 @@ async def notify_incident(headline: str, detail: str) -> list[tuple[str, str, bo
                 slack,
                 {"channel": settings.slack_channel, "text": f"{headline} — {detail}"},
                 "Paged on-call via Slack",
+                "paged on-call through the MCP Gateway",
             )
         )
     if linear:
@@ -50,7 +53,12 @@ async def notify_incident(headline: str, detail: str) -> list[tuple[str, str, bo
         if settings.linear_team:
             arguments["team"] = settings.linear_team
         results.append(
-            await _call(linear, arguments, "Opened incident ticket in Linear")
+            await _call(
+                linear,
+                arguments,
+                "Opened incident ticket in Linear",
+                "opened a Linear ticket through the MCP Gateway",
+            )
         )
     if not results:
         results.append(("No notify tools found", f"{len(tools)} MCP tools available", False))
