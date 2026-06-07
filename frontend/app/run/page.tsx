@@ -150,7 +150,7 @@ export default function RunPage() {
 
   return (
     <>
-      <header id="top" className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.06] px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+      <header id="top" className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.06] bg-[#08080a]/90 px-4 py-5 backdrop-blur sm:px-6 sm:py-6 lg:sticky lg:top-0 lg:z-10 lg:px-8">
           <div>
             <h1 className="text-2xl font-light tracking-tight">Incident Console</h1>
             <p className="mt-1 text-sm font-extralight text-zinc-500">
