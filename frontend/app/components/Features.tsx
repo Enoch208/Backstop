@@ -7,14 +7,14 @@ const FEATURES = [
     icon: "solar:hand-stars-linear",
     title: "The hands are removed",
     description:
-      "Destructive tools are never in the agent's toolset, and the action gate blocks any that slip through. It physically cannot nuke prod, even on a hallucination.",
+      "Destructive tools are never in the agent's toolset, and the action gate blocks any that slip through. It physically cannot take down prod, even on a hallucination.",
     badge: "Scoped tools",
   },
   {
     icon: "solar:check-read-linear",
     title: "Quality gate",
     description:
-      "A custom guardrail validates every diagnosis for groundedness: does the suspected resource and deploy SHA actually exist in the gathered signals? Ungrounded → re-route to a stronger model.",
+      "A custom guardrail validates every diagnosis for groundedness: do the suspected resource and deploy SHA actually exist in the gathered signals? Ungrounded → re-route to a stronger model.",
     badge: "Output guardrail",
   },
   {
@@ -28,14 +28,14 @@ const FEATURES = [
     icon: "solar:bolt-circle-linear",
     title: "Cascade circuit breaker",
     description:
-      "A running anomaly budget across steps. Trip the breaker, checkpoint state, and escalate to a human instead of amplifying a cascading failure.",
+      "A running anomaly budget across steps. Trip the breaker and escalate to a human instead of amplifying a cascading failure.",
     badge: "Resilience",
   },
   {
     icon: "solar:routing-2-linear",
     title: "Priority fallback chain",
     description:
-      "Claude → Llama → Nova, with retries, latency routing, and 5-minute cooldowns on unhealthy targets. Stays up through rate limits and outages.",
+      "Claude → Llama → Nova → Haiku, with retries, latency routing, and 5-minute cooldowns on unhealthy targets. Stays up through rate limits and outages.",
     badge: "AI Gateway",
   },
   {
@@ -68,8 +68,8 @@ export default function Features() {
           className="mt-6 max-w-xl text-lg leading-relaxed font-extralight text-zinc-400"
         >
           Six controls that turn a powerful agent into one you can hand the keys
-          to — each implemented through TrueFoundry&apos;s own gateway and
-          guardrails.
+          to — built on TrueFoundry&apos;s gateway and guardrails, hardened with
+          in-agent logic.
         </Reveal>
       </div>
 

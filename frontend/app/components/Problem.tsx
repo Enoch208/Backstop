@@ -37,8 +37,8 @@ export default function Problem() {
           <span className="text-white">up but wrong</span> — and the agent is
           about to act on it? A hallucinated deploy SHA. A rollback scoped to{" "}
           <span className="font-mono text-accent-2">all</span>. A restart aimed
-          at the prod database. The smartest model on earth still does this.
-          Backstop is the layer that catches it before it acts.
+          at the production database. Even the most capable model still does
+          this. Backstop is the layer that catches it before the agent acts.
         </Reveal>
 
         <div className="mt-16 grid w-full grid-cols-1 gap-px overflow-hidden border border-line bg-line md:grid-cols-2">
@@ -70,7 +70,7 @@ export default function Problem() {
               <span className="text-accent-2">catastrophic thing</span>.
             </p>
             <p className="text-sm font-extralight text-zinc-400">
-              The differentiator — and the customer story.
+              The differentiator — and the part that matters.
             </p>
           </div>
         </div>

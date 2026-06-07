@@ -80,12 +80,12 @@ export default function IncidentsPage() {
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1 text-xs font-medium text-red-400">
-                      naive: {run.naive_outcome}
+                      Naive: {run.naive_outcome}
                     </span>
                     <span
                       className={`rounded-full border px-3 py-1 text-xs font-medium ${OUTCOME[run.hardened.outcome] ?? OUTCOME.running}`}
                     >
-                      backstop: {run.hardened.outcome}
+                      Backstop: {run.hardened.outcome}
                     </span>
                   </div>
                 </div>

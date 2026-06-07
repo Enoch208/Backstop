@@ -17,7 +17,7 @@ export default function DemoCallout() {
           </Reveal>
           <MaskedText
             as="h2"
-            text="Same alert. One acts on a lie."
+            text="Same alert. One agent acts on a lie."
             className="max-w-3xl justify-center text-3xl font-light tracking-tighter text-white md:text-5xl"
           />
           <Reveal
@@ -68,7 +68,7 @@ export default function DemoCallout() {
                   icon="solar:arrow-right-linear"
                   className="mt-0.5 shrink-0 text-red-400/70"
                 />
-                Rolls back everything / restarts the DB → catastrophic.
+                Rolls back everything / restarts prod-db → catastrophic.
               </li>
             </ul>
           </Reveal>
@@ -124,7 +124,8 @@ export default function DemoCallout() {
             <p className="mb-12 max-w-xl text-lg leading-relaxed font-extralight text-zinc-400">
               The failure and the recovery are real — a live Kubernetes cluster
               you actually break and watch recover, diagnosed by Claude through
-              the TrueFoundry gateway, caught by custom guardrails. No theater.
+              the TrueFoundry AI Gateway, caught by custom guardrails. No
+              theater.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row">
               <Link
@@ -157,8 +158,8 @@ export default function DemoCallout() {
                 Built for the brief
               </h4>
               <p className="text-sm leading-relaxed font-extralight text-white/80">
-                Every red and amber event maps to a TrueFoundry capability:
-                gateway, MCP, custom guardrails, observability.
+                Every red and amber event maps to a TrueFoundry capability: AI
+                Gateway, MCP Gateway, custom guardrails, observability.
               </p>
             </div>
             <div className="absolute -right-24 -bottom-24 h-72 w-72 rounded-full border border-white/20 transition-transform duration-1000 ease-out group-hover:scale-110" />

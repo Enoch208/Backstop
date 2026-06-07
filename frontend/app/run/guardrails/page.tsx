@@ -5,7 +5,7 @@ const GUARDRAILS = [
     icon: "solar:eye-closed-linear",
     name: "PII redaction",
     type: "Input · Mutate · registered in TrueFoundry",
-    desc: "Masks secrets (credentials, tokens, IPs) out of the gathered signals before the model ever sees them.",
+    desc: "Masks secrets (credentials, tokens, IPs) in the gathered signals before the model ever sees them.",
     checks: ["connection strings", "api keys / tokens", "emails", "ip addresses"],
   },
   {
@@ -23,7 +23,7 @@ const GUARDRAILS = [
     icon: "solar:shield-warning-linear",
     name: "Action-validation gate",
     type: "Pre-execution · in-agent",
-    desc: "The last line of defence — validates the proposed write against policy before it touches the cluster.",
+    desc: "The last line of defense — validates the proposed write against policy before it touches the cluster.",
     checks: [
       "blast radius (no scope=all)",
       "no protected resources (prod-db, payments)",
@@ -36,7 +36,7 @@ const GUARDRAILS = [
     name: "Cascade circuit breaker",
     type: "Resilience · in-agent",
     desc: "A running anomaly budget across steps. Trips and escalates to a human instead of amplifying a cascading failure.",
-    checks: ["counts blocked gates + tool errors", "trips at budget", "checkpoints + escalates"],
+    checks: ["counts blocked gates + tool errors", "trips at budget", "escalates to a human"],
   },
 ];
 
@@ -46,7 +46,7 @@ export default function GuardrailsPage() {
       <header className="border-b border-white/[0.06] px-8 py-6">
         <h1 className="text-2xl font-light tracking-tight">Guardrails</h1>
         <p className="mt-1 text-sm font-extralight text-zinc-500">
-          The safety layer that makes a wrong model output unable to become a destructive action.
+          The safety layer that stops a wrong model output from becoming a destructive action.
         </p>
       </header>
 

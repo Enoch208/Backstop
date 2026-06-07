@@ -36,9 +36,9 @@ export default function Hero() {
           className="mt-8 max-w-2xl text-lg leading-relaxed font-extralight text-zinc-400 md:text-xl"
         >
           An on-call SRE agent that triages and remediates live incidents —
-          engineered so a model that is{" "}
-          <span className="text-white">up but wrong</span> can never turn a bad
-          output into a destructive action.
+          engineered so that even when the model is{" "}
+          <span className="text-white">up but wrong</span>, a bad output can
+          never become a destructive action.
         </Reveal>
 
         <Reveal

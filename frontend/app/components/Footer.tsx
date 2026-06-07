@@ -9,8 +9,9 @@ export default function Footer() {
         <div className="flex max-w-sm flex-col items-start">
           <Wordmark className="mb-6" />
           <p className="mb-8 text-sm leading-relaxed font-extralight text-zinc-500">
-            An on-call incident agent that fails safe, not just stays up. Built
-            for the Resilient Agents hackathon on TrueFoundry × AWS Bedrock.
+            An on-call SRE incident agent that fails safe, not just stays up.
+            Built for the Resilient Agents hackathon on TrueFoundry × AWS
+            Bedrock.
           </p>
           <div className="flex items-center gap-4 text-zinc-500">
             <a

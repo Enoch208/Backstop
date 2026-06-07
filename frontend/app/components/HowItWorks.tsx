@@ -25,7 +25,7 @@ const STEPS = [
     icon: "solar:rocket-2-linear",
     title: "Execute or escalate",
     description:
-      "Only validated, scoped actions run — through a separate narrow-write path. Then the on-call is paged and a ticket opened over the MCP gateway. If the anomaly budget trips, it hands off to a human.",
+      "Only validated, scoped actions run — through a separate narrow-write path. Then the on-call is paged and a ticket opened over the MCP Gateway. If the anomaly budget trips, it hands off to a human.",
   },
 ];
 
@@ -53,9 +53,9 @@ export default function HowItWorks() {
             delay={120}
             className="mt-6 max-w-xl text-lg leading-relaxed font-extralight text-zinc-400"
           >
-            The product is the failure handling. A loop budget caps runaway
-            cascades; state is checkpointed after each step so it resumes
-            instead of restarting.
+            The failure handling is the product. A loop budget caps runaway
+            cascades, and every step is recorded so a failure escalates with
+            full context instead of losing it.
           </Reveal>
         </div>
 
