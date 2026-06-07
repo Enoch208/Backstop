@@ -120,14 +120,14 @@ export default function RunPage() {
 
   return (
     <>
-      <header id="top" className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.06] px-8 py-6">
+      <header id="top" className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.06] px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
           <div>
             <h1 className="text-2xl font-light tracking-tight">Incident Console</h1>
             <p className="mt-1 text-sm font-extralight text-zinc-500">
               Same alert, two agents — naive vs Backstop, on a real cluster.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={testFallback}
@@ -158,7 +158,7 @@ export default function RunPage() {
           </div>
         </header>
 
-        <div className="flex flex-1 flex-col gap-6 p-8">
+        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
           {!runIds && (
             <div className="flex flex-col gap-5 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-[#16161c] to-[#0d0d10] p-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-start gap-4">
