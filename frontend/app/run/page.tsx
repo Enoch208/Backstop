@@ -28,6 +28,12 @@ const SCENARIOS = [
     note: "stays wrong → circuit breaker trips → escalate",
   },
   {
+    id: "tool_failure",
+    label: "Tool failure",
+    icon: "solar:plug-circle-linear",
+    note: "cluster API fails mid-action → naive crashes, Backstop escalates",
+  },
+  {
     id: "clean",
     label: "Clean signal",
     icon: "solar:check-circle-linear",

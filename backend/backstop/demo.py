@@ -28,12 +28,12 @@ def _grounded(signals: Signals) -> Diagnosis:
     )
 
 
-SCENARIOS = ("hallucination", "cascade", "clean")
+SCENARIOS = ("hallucination", "cascade", "clean", "tool_failure")
 
 
 def scenario_diagnoser(scenario: str, live: bool):
     def diagnoser(signals: Signals, model: str | None = None) -> Diagnosis:
-        if scenario == "clean":
+        if scenario in ("clean", "tool_failure"):
             return _grounded(signals)
         if scenario == "cascade":
             return _hallucinated(signals)

@@ -41,3 +41,17 @@ def test_clean_scenario_is_grounded_from_the_start():
     diagnoser = scenario_diagnoser("clean", live=False)
 
     assert check_quality(diagnoser(signals, None), signals).passed is True
+
+
+def test_tool_failure_backend_raises_on_apply():
+    from backstop.contracts import ActionType, ProposedAction
+    from backstop.controller import with_tool_failure
+
+    backend = with_tool_failure(MockBackend())
+    backend.inject_incident()
+    assert backend.gather().metrics["checkout.error_rate"] > 0.3
+    try:
+        backend.apply(ProposedAction(type=ActionType.rollback_deploy, target="f00bad9"))
+    except RuntimeError:
+        return
+    raise AssertionError("expected the tool to fail")

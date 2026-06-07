@@ -35,6 +35,9 @@ async def demo(scenario: str = "hallucination") -> dict:
     )
     del _recent_runs[20:]
     naive_backend, hardened_backend = controller.make_backends()
+    if scenario == "tool_failure":
+        naive_backend = controller.with_tool_failure(naive_backend)
+        hardened_backend = controller.with_tool_failure(hardened_backend)
     asyncio.create_task(
         execute_demo(
             naive_backend,
