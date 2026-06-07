@@ -118,7 +118,23 @@ The `run_naive` path skips steps 3, 5, 7, and the tool-failure handling — it t
 
 ## How I integrated TrueFoundry + AWS Bedrock
 
-Every capability below is wired through the platform, not faked.
+Every capability below is wired through the platform, not faked. Here's the system view — where each piece lives and how it connects:
+
+```mermaid
+graph TD
+    UI["Dashboard · Next.js<br/>live SSE console"] <--> API["Run API · FastAPI<br/>/demo · /events · /receipt"]
+    API --> AGENT["Triage agent<br/>gather → diagnose → gates → act"]
+
+    AGENT -->|"OpenAI SDK"| GW["TrueFoundry AI Gateway<br/>routing · fallback · rate-limit · budget · prompts"]
+    GW -->|"priority fallback"| BR["AWS Bedrock<br/>Sonnet → Llama → Nova → Haiku"]
+    GW -.->|"input + output hooks"| GR["Guardrails<br/>Secrets · PII · custom quality"]
+
+    AGENT -->|"streamable-http"| MCP["TrueFoundry MCP Gateway"]
+    MCP --> LIN["Linear<br/>notify + ticket"]
+    MCP --> INF["Custom infra MCP<br/>read-only cluster signals"]
+
+    AGENT -->|"scoped read / write"| K8S["Real Kubernetes · kind<br/>naive + hardened namespaces"]
+```
 
 ### AI Gateway + Virtual Models
 I point the OpenAI SDK at the gateway (`base_url` + a virtual key) and call a single **virtual model, `prod-triage`**, that I configured with a **priority fallback chain over AWS Bedrock**: **Claude Sonnet → Llama 4 Maverick → Amazon Nova Pro → Claude Haiku**, with retry/fallback on `401/403/404/408/429/5xx`. The agent calls one model name; the gateway handles failover. I also attached a **rate-limit policy** (to force and demonstrate live failover) and a **budget/cost-limit policy** across the chain. Every call carries `X-TFY-LOGGING-CONFIG`, so request traces, fallback events, and per-model cost land in **AI Monitoring**.
