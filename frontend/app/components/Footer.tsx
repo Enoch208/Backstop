@@ -24,7 +24,7 @@ export default function Footer() {
               <Icon icon="simple-icons:github" width={20} />
             </a>
             <a
-              href="https://x.com"
+              href="https://x.com/dreyethh"
               target="_blank"
               rel="noreferrer"
               aria-label="X"
